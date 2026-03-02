@@ -55,6 +55,10 @@ schedule:
 platforms:
   enabled: true                         # 是否启用热榜平台抓取
   sources:
+    - id: "36kr-quick"
+      name: "36氪 快讯"
+    - id: "36kr-renqi"
+      name: "36氪 人气榜"
     - id: "toutiao"
       name: "今日头条"
     - id: "baidu"
@@ -77,6 +81,14 @@ platforms:
       name: "抖音"
     - id: "zhihu"
       name: "知乎"
+    - id: "hackernews"
+      name: "Hacker News"
+    - id: "wallstreetcn-hot"
+      name: "华尔街见闻 最热"
+    - id: "wallstreetcn-quick"
+      name: "华尔街见闻 快讯"
+    - id: "wallstreetcn-news"
+      name: "华尔街见闻 最新"
 
 
 
