@@ -72,6 +72,8 @@ def split_content_into_batches(
                 )
                 # 移除标题后的[数字]后缀（如[19]）
                 formatted_title = formatted_title.rsplit("[", 1)[0].rstrip()
+                # 移除末尾的 **
+                formatted_title = formatted_title.rstrip("*").rstrip()
                 all_new_titles.append(f"{global_index}. {formatted_title}")
                 global_index += 1
             if global_index > max_titles:

@@ -92,6 +92,7 @@ def send_to_feishu(
     ai_analysis: Any = None,
     display_regions: Optional[Dict] = None,
     standalone_data: Optional[Dict] = None,
+    show_new_section: bool = True,
 ) -> bool:
     """
     发送到飞书（支持分批发送，支持热榜+RSS合并+独立展示区）
@@ -152,6 +153,7 @@ def send_to_feishu(
         standalone_data=standalone_data,
         ai_stats=ai_stats,
         report_type=report_type,
+        show_new_section=show_new_section,
     )
 
     # 统一添加批次头部（已预留空间，不会超限）
@@ -223,6 +225,7 @@ def send_to_dingtalk(
     ai_analysis: Any = None,
     display_regions: Optional[Dict] = None,
     standalone_data: Optional[Dict] = None,
+    show_new_section: bool = True,
 ) -> bool:
     """
     发送到钉钉（支持分批发送，支持热榜+RSS合并+独立展示区）
@@ -282,6 +285,7 @@ def send_to_dingtalk(
         standalone_data=standalone_data,
         ai_stats=ai_stats,
         report_type=report_type,
+        show_new_section=show_new_section,
     )
 
     # 统一添加批次头部（已预留空间，不会超限）
