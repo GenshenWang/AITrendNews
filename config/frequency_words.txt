@@ -172,17 +172,54 @@
 [AI 相关]
 /(?<![a-zA-Z])ai(?![a-zA-Z])/
 人工智能
-\b(AI|大模型|大语言模型|LLM|生成式AI|AIGC|OpenAI|DeepSeek|OpenClaw|ChatGPT)\b
-\b(GPT-4|Sora|Claude|Gemini|文心一言|通义千问|豆包|讯飞星火|混元大模型|Kimi)\b
-\b(多模态|自然语言处理|NLP|计算机视觉|CV|机器学习|深度学习|神经网络|AGI|通用人工智能)\b
-\b(提示词|提示工程|微调|模型微调|RAG|知识库|向量数据库|对齐|指令微调|小样本学习)\b
-\b(算力|GPU|NPU|TPU|显存|集群|大模型训练|模型推理|算力租赁|芯片)\b
-\b(AI绘画|AI视频|AI编程|AI写作|语音识别|语音合成|图像生成|视频生成|文本生成|数字人)\b
-\b(开源大模型|LLaMA|Mistral|智谱AI|百川智能|阶跃星辰|月之暗面|混元|盘古大模型|通义星尘)\b
-\b(AI助手|Copilot|AI办公|AI直播|AI翻译|AI设计|代码生成|智能问答|舆情分析|数据挖掘)\b
-\b(大模型部署|私有化部署|轻量化|MaaS|模型即服务|API|调用|推理优化|量化|蒸馏)\b
-\b(AI医疗|AI教育|AI金融|自动驾驶|工业AI|GPT-5|多轮对话|上下文窗口|幻觉|AI安全)\b
-
+大模型
+大语言模型
+LLM
+生成式AI
+AIGC
+OpenAI
+DeepSeek
+OpenClaw
+ChatGPT
+GPT-4
+Sora
+Claude
+Claude Code
+Gemini
+文心一言
+通义千问
+豆包
+Kimi
+多模态
+自然语言处理
+通用人工智能
+深度学习
+提示词
+知识库
+RAG
+大模型训练
+模型推理
+AI绘画
+AI编程
+Vibe Coding
+AI视频
+语音识别
+数字人
+开源大模型
+智谱AI
+Copilot
+AI办公
+AI直播
+AI翻译
+AI设计
+AI医疗
+AI金融
+AI教育
+代码生成
+智能问答
+大模型部署
+模型即服务
+推理优化
 
 
 
