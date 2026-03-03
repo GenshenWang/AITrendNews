@@ -81,8 +81,6 @@ platforms:
       name: "抖音"
     - id: "zhihu"
       name: "知乎"
-    - id: "hackernews"
-      name: "Hacker News"
     - id: "wallstreetcn-hot"
       name: "华尔街见闻 最热"
     - id: "wallstreetcn-quick"
