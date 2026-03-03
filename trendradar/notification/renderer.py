@@ -58,32 +58,39 @@ def render_dingtalk_content(
     get_time_func: Optional[Callable[[], datetime]] = None,
     rss_items: Optional[list] = None,
     show_new_section: bool = True,
+    report_type: str = "AI热门资讯"
 ) -> str:
-    """渲染钉钉通知内容：仅【加粗日期主标题 + 全局序号. 标题（链接）】"""
-    # 1. 构造加粗主标题（核心：纯日期+AI热门资讯，无多余前缀）
+    """
+    渲染钉钉通知内容（与分批模块格式完全一致）
+    核心格式：**YYYY-MM-DD AI热门资讯** + 全局连续序号. 标题（链接）
+    """
+    # 1. 生成加粗日期主标题（和分批模块对齐）
     now = get_time_func() if get_time_func else datetime.now()
-    main_title = f"**{now.strftime('%Y-%m-%d')} AI热门资讯**"
+    main_title = f"**{now.strftime('%Y-%m-%d')} {report_type}**"
     
-    # 2. 扁平化遍历所有新闻，生成全局序号条目（彻底删除来源分组打印）
-    items = []
-    global_index = 1
+    # 2. 扁平化提取所有新增新闻，生成全局序号列表
+    all_new_titles = []
     if show_new_section and report_data.get("new_titles", []):
-        # 关键：只遍历标题，不打印任何来源名称（如36氪 快讯）
+        global_index = 1
         for source_data in report_data["new_titles"]:
             for title_data in source_data["titles"]:
                 title_data_copy = title_data.copy()
                 title_data_copy["is_new"] = False
+                # 生成纯标题+链接，不显示来源
                 formatted_title = format_title_for_platform(
                     "dingtalk", title_data_copy, show_source=False
                 )
-                items.append(f"{global_index}. {formatted_title}")
+                # 移除标题后的[数字]后缀（如[19]）
+                formatted_title = formatted_title.rsplit("[", 1)[0].rstrip()
+                all_new_titles.append(f"{global_index}. {formatted_title}")
                 global_index += 1
 
-    # 3. 拼接最终内容（无任何头部/统计/分隔线）
-    if items:
-        return f"{main_title}\n\n" + "\n".join(items)
-    else:
+    # 3. 拼接最终内容（无任何冗余信息）
+    if not all_new_titles:
         return f"{main_title}\n\n📭 暂无本次新增热点新闻"
+    
+    final_content = f"{main_title}\n\n" + "\n".join(all_new_titles)
+    return final_content
 
 
 def render_rss_feishu_content(
