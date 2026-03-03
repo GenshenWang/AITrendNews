@@ -345,7 +345,7 @@ ai:
   
   model: "gemini/gemini-2.5-flash"
 
-  api_key: "AIzaSyArHJf6BhR_BJHWYbFGy627XH-ZwhGcRQs"                       # API Key（建议使用环境变量 AI_API_KEY）
+  api_key: ""                       # API Key（建议使用环境变量 AI_API_KEY）
   
   api_base: ""                      # 自定义 API 端点（可选，大多数情况留空）
                                     # 示例: https://api.openai.com/v1（自建代理或兼容接口）
