@@ -390,6 +390,7 @@ class AppContext:
         standalone_data: Optional[Dict] = None,
         ai_stats: Optional[Dict] = None,
         report_type: str = "热点分析报告",
+        show_new_section: Optional[bool] = None,
     ) -> List[str]:
         """分批处理消息内容（支持热榜+RSS合并+AI分析+独立展示区）
 
@@ -432,7 +433,7 @@ class AppContext:
             rank_threshold=self.rank_threshold,
             ai_stats=ai_stats,
             report_type=report_type,
-            show_new_section=self.show_new_section,
+            show_new_section=self.show_new_section if show_new_section is None else show_new_section,
         )
 
     # === 通知发送 ===
