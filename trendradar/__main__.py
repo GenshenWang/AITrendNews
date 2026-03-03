@@ -203,7 +203,7 @@ class NewsAnalyzer:
         "daily": {
             "mode_name": "全天汇总模式",
             "description": "全天汇总模式（所有匹配新闻 + 新增新闻区域 + 按时推送）",
-            "report_type": "全天汇总",
+            "report_type": "AI 热门资讯",
             "should_send_notification": True,
         },
     }
