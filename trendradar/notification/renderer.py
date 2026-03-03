@@ -21,20 +21,33 @@ def render_feishu_content(
     rss_items: Optional[list] = None,
     show_new_section: bool = True,
 ) -> str:
-    """渲染飞书通知内容，仅保留【全局序号. 标题（链接）】核心格式"""
-    new_titles_content = ""
-    if show_new_section and report_data["new_titles"]:
-        global_index = 1
+    """渲染飞书通知内容：仅【加粗日期主标题 + 全局序号. 标题（链接）】"""
+    # 1. 构造加粗主标题（和钉钉统一格式）
+    now = get_time_func() if get_time_func else datetime.now()
+    main_title = f"**{now.strftime('%Y-%m-%d')} AI热门资讯**"
+    
+    # 2. 扁平化遍历所有新闻，生成全局序号条目（完全删除来源分组）
+    items = []
+    global_index = 1
+    if show_new_section and report_data.get("new_titles", []):
+        # 直接扁平化，跳过来源分组的打印
         for source_data in report_data["new_titles"]:
             for title_data in source_data["titles"]:
+                # 移除is_new标记，避免格式干扰
                 title_data_copy = title_data.copy()
                 title_data_copy["is_new"] = False
+                # 生成纯标题+链接，不包含来源/后缀数字
                 formatted_title = format_title_for_platform(
                     "feishu", title_data_copy, show_source=False
                 )
-                new_titles_content += f"{global_index}. {formatted_title}\n"
+                items.append(f"{global_index}. {formatted_title}")
                 global_index += 1
-    return new_titles_content.rstrip("\n") if new_titles_content else "📭 暂无本次新增热点新闻"
+
+    # 3. 拼接最终内容
+    if items:
+        return f"{main_title}\n\n" + "\n".join(items)
+    else:
+        return f"{main_title}\n\n📭 暂无本次新增热点新闻"
 
 
 def render_dingtalk_content(
@@ -46,17 +59,16 @@ def render_dingtalk_content(
     rss_items: Optional[list] = None,
     show_new_section: bool = True,
 ) -> str:
-    """渲染钉钉通知内容，格式：【加粗主标题（日期AI热门资讯） + 全局序号. 标题（链接）】"""
-    # 1. 获取当前日期，格式化为 YYYY-MM-DD
+    """渲染钉钉通知内容：仅【加粗日期主标题 + 全局序号. 标题（链接）】"""
+    # 1. 构造加粗主标题（核心：纯日期+AI热门资讯，无多余前缀）
     now = get_time_func() if get_time_func else datetime.now()
-    date_str = now.strftime("%Y-%m-%d")
-    # 2. 构造加粗主标题：XXX 日期AI热门资讯（这里XXX可根据需求替换，默认用「每日」）
-    main_title = f"**每日 {date_str} AI热门资讯**"
+    main_title = f"**{now.strftime('%Y-%m-%d')} AI热门资讯**"
     
-    # 3. 生成全局序号的新闻条目
-    new_titles_content = ""
-    if show_new_section and report_data["new_titles"]:
-        global_index = 1
+    # 2. 扁平化遍历所有新闻，生成全局序号条目（彻底删除来源分组打印）
+    items = []
+    global_index = 1
+    if show_new_section and report_data.get("new_titles", []):
+        # 关键：只遍历标题，不打印任何来源名称（如36氪 快讯）
         for source_data in report_data["new_titles"]:
             for title_data in source_data["titles"]:
                 title_data_copy = title_data.copy()
@@ -64,16 +76,14 @@ def render_dingtalk_content(
                 formatted_title = format_title_for_platform(
                     "dingtalk", title_data_copy, show_source=False
                 )
-                new_titles_content += f"{global_index}. {formatted_title}\n"
+                items.append(f"{global_index}. {formatted_title}")
                 global_index += 1
-    
-    # 4. 拼接最终内容（主标题 + 条目，无内容时仅显示主标题+提示）
-    if new_titles_content:
-        final_content = f"{main_title}\n\n{new_titles_content}".rstrip("\n")
+
+    # 3. 拼接最终内容（无任何头部/统计/分隔线）
+    if items:
+        return f"{main_title}\n\n" + "\n".join(items)
     else:
-        final_content = f"{main_title}\n\n📭 暂无本次新增热点新闻"
-    
-    return final_content
+        return f"{main_title}\n\n📭 暂无本次新增热点新闻"
 
 
 def render_rss_feishu_content(
@@ -82,21 +92,18 @@ def render_rss_feishu_content(
     separator: str = "---",
     get_time_func: Optional[Callable[[], datetime]] = None,
 ) -> str:
-    """渲染 RSS 飞书通知内容，仅保留【大标题 + 全局序号. 标题（链接）】格式"""
-    if not rss_items:
-        return "📭 暂无新的 RSS 订阅内容"
-
-    text_content = "📰 **RSS 订阅更新**\n\n"
+    """渲染RSS飞书内容：仅【加粗主标题 + 全局序号. 标题（链接）】"""
+    now = get_time_func() if get_time_func else datetime.now()
+    main_title = f"**{now.strftime('%Y-%m-%d')} RSS订阅更新**"
+    items = []
     global_index = 1
-    for item in rss_items:
-        title = item.get("title", "")
-        url = item.get("url", "")
-        if url:
-            text_content += f"{global_index}. [{title}]({url})\n"
-        else:
-            text_content += f"{global_index}. {title}\n"
-        global_index += 1
-    return text_content.rstrip("\n")
+    if rss_items:
+        for item in rss_items:
+            title = item.get("title", "")
+            url = item.get("url", "")
+            items.append(f"{global_index}. [{title}]({url})" if url else f"{global_index}. {title}")
+            global_index += 1
+    return f"{main_title}\n\n" + "\n".join(items) if items else f"{main_title}\n\n📭 暂无新的RSS订阅内容"
 
 
 def render_rss_dingtalk_content(
@@ -104,21 +111,18 @@ def render_rss_dingtalk_content(
     feeds_info: Optional[Dict] = None,
     get_time_func: Optional[Callable[[], datetime]] = None,
 ) -> str:
-    """渲染 RSS 钉钉通知内容，仅保留【大标题 + 全局序号. 标题（链接）】格式"""
-    if not rss_items:
-        return "📭 暂无新的 RSS 订阅内容"
-
-    text_content = "📰 **RSS 订阅更新**\n\n"
+    """渲染RSS钉钉内容：仅【加粗主标题 + 全局序号. 标题（链接）】"""
+    now = get_time_func() if get_time_func else datetime.now()
+    main_title = f"**{now.strftime('%Y-%m-%d')} RSS订阅更新**"
+    items = []
     global_index = 1
-    for item in rss_items:
-        title = item.get("title", "")
-        url = item.get("url", "")
-        if url:
-            text_content += f"{global_index}. [{title}]({url})\n"
-        else:
-            text_content += f"{global_index}. {title}\n"
-        global_index += 1
-    return text_content.rstrip("\n")
+    if rss_items:
+        for item in rss_items:
+            title = item.get("title", "")
+            url = item.get("url", "")
+            items.append(f"{global_index}. [{title}]({url})" if url else f"{global_index}. {title}")
+            global_index += 1
+    return f"{main_title}\n\n" + "\n".join(items) if items else f"{main_title}\n\n📭 暂无新的RSS订阅内容"
 
 
 def render_rss_markdown_content(
@@ -126,54 +130,42 @@ def render_rss_markdown_content(
     feeds_info: Optional[Dict] = None,
     get_time_func: Optional[Callable[[], datetime]] = None,
 ) -> str:
-    """渲染 RSS 通用 Markdown 格式内容，仅保留【大标题 + 全局序号. 标题（链接）】格式"""
-    if not rss_items:
-        return "📭 暂无新的 RSS 订阅内容"
-
-    text_content = "📰 **RSS 订阅更新**\n\n"
+    """渲染RSS通用Markdown内容：仅【加粗主标题 + 全局序号. 标题（链接）】"""
+    now = get_time_func() if get_time_func else datetime.now()
+    main_title = f"**{now.strftime('%Y-%m-%d')} RSS订阅更新**"
+    items = []
     global_index = 1
-    for item in rss_items:
-        title = item.get("title", "")
-        url = item.get("url", "")
-        if url:
-            text_content += f"{global_index}. [{title}]({url})\n"
-        else:
-            text_content += f"{global_index}. {title}\n"
-        global_index += 1
-    return text_content.rstrip("\n")
+    if rss_items:
+        for item in rss_items:
+            title = item.get("title", "")
+            url = item.get("url", "")
+            items.append(f"{global_index}. [{title}]({url})" if url else f"{global_index}. {title}")
+            global_index += 1
+    return f"{main_title}\n\n" + "\n".join(items) if items else f"{main_title}\n\n📭 暂无新的RSS订阅内容"
 
 
+# 以下辅助函数若无需合并推送，可直接删除；若需保留，同步扁平化修改
 def _render_rss_section_feishu(rss_items: list, separator: str = "---") -> str:
-    """渲染 RSS 内容区块（飞书格式），仅保留【大标题 + 全局序号. 标题（链接）】格式"""
     if not rss_items:
         return ""
-
-    text_content = "📰 **RSS 订阅更新**\n\n"
+    items = []
     global_index = 1
     for item in rss_items:
         title = item.get("title", "")
         url = item.get("url", "")
-        if url:
-            text_content += f"{global_index}. [{title}]({url})\n"
-        else:
-            text_content += f"{global_index}. {title}\n"
+        items.append(f"{global_index}. [{title}]({url})" if url else f"{global_index}. {title}")
         global_index += 1
-    return text_content.rstrip("\n")
+    return "📰 **RSS订阅更新**\n\n" + "\n".join(items)
 
 
 def _render_rss_section_markdown(rss_items: list) -> str:
-    """渲染 RSS 内容区块（通用 Markdown 格式），仅保留【大标题 + 全局序号. 标题（链接）】格式"""
     if not rss_items:
         return ""
-
-    text_content = "📰 **RSS 订阅更新**\n\n"
+    items = []
     global_index = 1
     for item in rss_items:
         title = item.get("title", "")
         url = item.get("url", "")
-        if url:
-            text_content += f"{global_index}. [{title}]({url})\n"
-        else:
-            text_content += f"{global_index}. {title}\n"
+        items.append(f"{global_index}. [{title}]({url})" if url else f"{global_index}. {title}")
         global_index += 1
-    return text_content.rstrip("\n")
+    return "📰 **RSS订阅更新**\n\n" + "\n".join(items)
