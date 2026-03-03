@@ -59,8 +59,11 @@ def split_content_into_batches(
     all_new_titles = []
     if show_new_section and report_data.get("new_titles", []):
         global_index = 1
+        max_titles = 15  # 固定推送 15 条
         for source_data in report_data["new_titles"]:
             for title_data in source_data["titles"]:
+                if global_index > max_titles:
+                    break
                 title_data_copy = title_data.copy()
                 title_data_copy["is_new"] = False
                 # 生成纯标题+链接，不显示来源
@@ -71,6 +74,8 @@ def split_content_into_batches(
                 formatted_title = formatted_title.rsplit("[", 1)[0].rstrip()
                 all_new_titles.append(f"{global_index}. {formatted_title}")
                 global_index += 1
+            if global_index > max_titles:
+                break
 
     # 核心修改3：分批处理（仅处理新增新闻，忽略所有其他区块）
     if not all_new_titles:
