@@ -34,8 +34,11 @@ def render_dingtalk_content(
     all_new_titles = []
     if show_new_section and report_data.get("new_titles", []):
         global_index = 1
+        max_titles = 15  # 固定推送 15 条
         for source_data in report_data["new_titles"]:
             for title_data in source_data["titles"]:
+                if global_index > max_titles:
+                    break
                 title_data_copy = title_data.copy()
                 title_data_copy["is_new"] = False
                 # 生成纯标题+链接，不显示来源
@@ -48,11 +51,13 @@ def render_dingtalk_content(
                 formatted_title = formatted_title.rstrip("*").rstrip()
                 all_new_titles.append(f"{global_index}. {formatted_title}")
                 global_index += 1
+            if global_index > max_titles:
+                break
 
     # 3. 拼接最终内容（无任何冗余信息）
     if not all_new_titles:
         return f"{main_title}\n\n📭 暂无本次新增热点新闻"
-    
+
     final_content = f"{main_title}\n\n" + "\n".join(all_new_titles)
     return final_content
 
@@ -75,13 +80,16 @@ def render_feishu_content(
     # 1. 生成加粗日期主标题（和分批模块、钉钉渲染函数对齐）
     now = get_time_func() if get_time_func else datetime.now()
     main_title = f"**{now.strftime('%Y-%m-%d')} {report_type}**"
-    
+
     # 2. 扁平化提取所有新增新闻，生成全局序号列表
     all_new_titles = []
     if show_new_section and report_data.get("new_titles", []):
         global_index = 1
+        max_titles = 15  # 固定推送 15 条
         for source_data in report_data["new_titles"]:
             for title_data in source_data["titles"]:
+                if global_index > max_titles:
+                    break
                 title_data_copy = title_data.copy()
                 title_data_copy["is_new"] = False
                 # 生成纯标题+链接，不显示来源
@@ -94,11 +102,13 @@ def render_feishu_content(
                 formatted_title = formatted_title.rstrip("*").rstrip()
                 all_new_titles.append(f"{global_index}. {formatted_title}")
                 global_index += 1
+            if global_index > max_titles:
+                break
 
     # 3. 拼接最终内容（无任何冗余信息）
     if not all_new_titles:
         return f"{main_title}\n\n📭 暂无本次新增热点新闻"
-    
+
     final_content = f"{main_title}\n\n" + "\n".join(all_new_titles)
     return final_content
 
