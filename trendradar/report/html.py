@@ -753,7 +753,7 @@ def render_html_content(
     elif mode == "incremental":
         html += "增量分析"
     else:
-        html += "全天汇总"
+        html += "AI热门资讯"
 
     html += """</span>
                     </div>
