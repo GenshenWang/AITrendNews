@@ -32,9 +32,10 @@ def render_dingtalk_content(
     
     # 2. 扁平化提取所有新增新闻，生成全局序号列表
     all_new_titles = []
+    seen_titles = set()  # 用于去重
     if show_new_section and report_data.get("new_titles", []):
         global_index = 1
-        max_titles = 15  # 固定推送 15 条
+        max_titles = 10  # 固定推送 10 条
         for source_data in report_data["new_titles"]:
             for title_data in source_data["titles"]:
                 if global_index > max_titles:
@@ -49,8 +50,12 @@ def render_dingtalk_content(
                 formatted_title = formatted_title.rsplit("[", 1)[0].rstrip()
                 # 新增：移除末尾的 **
                 formatted_title = formatted_title.rstrip("*").rstrip()
-                all_new_titles.append(f"{global_index}. {formatted_title}")
-                global_index += 1
+                # 去重：使用纯标题文本（不含链接）作为去重键
+                title_text = formatted_title.split("(")[0].strip() if "(" in formatted_title else formatted_title
+                if title_text not in seen_titles:
+                    seen_titles.add(title_text)
+                    all_new_titles.append(f"{global_index}. {formatted_title}")
+                    global_index += 1
             if global_index > max_titles:
                 break
 
@@ -83,9 +88,10 @@ def render_feishu_content(
 
     # 2. 扁平化提取所有新增新闻，生成全局序号列表
     all_new_titles = []
+    seen_titles = set()  # 用于去重
     if show_new_section and report_data.get("new_titles", []):
         global_index = 1
-        max_titles = 15  # 固定推送 15 条
+        max_titles = 10  # 固定推送 10 条
         for source_data in report_data["new_titles"]:
             for title_data in source_data["titles"]:
                 if global_index > max_titles:
@@ -100,8 +106,12 @@ def render_feishu_content(
                 formatted_title = formatted_title.rsplit("[", 1)[0].rstrip()
                 # 新增：移除末尾的 **
                 formatted_title = formatted_title.rstrip("*").rstrip()
-                all_new_titles.append(f"{global_index}. {formatted_title}")
-                global_index += 1
+                # 去重：使用纯标题文本（不含链接）作为去重键
+                title_text = formatted_title.split("(")[0].strip() if "(" in formatted_title else formatted_title
+                if title_text not in seen_titles:
+                    seen_titles.add(title_text)
+                    all_new_titles.append(f"{global_index}. {formatted_title}")
+                    global_index += 1
             if global_index > max_titles:
                 break
 
