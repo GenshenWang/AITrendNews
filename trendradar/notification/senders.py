@@ -303,7 +303,7 @@ def send_to_dingtalk(
         payload = {
             "msgtype": "markdown",
             "markdown": {
-                "title": f"TrendRadar 热点分析报告 - {report_type}",
+                "title": f"{report_type}",
                 "text": batch_content,
             },
         }
