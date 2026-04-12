@@ -45,8 +45,7 @@ def format_title_for_platform(
         格式化后的标题字符串
     """
     rank_display = format_rank_display(
-        title_data["ranks"], title_data["rank_threshold"], platform,
-        use_html=not (platform == "feishu" and not show_source and not show_keyword)
+        title_data["ranks"], title_data["rank_threshold"], platform
     )
 
     link_url = title_data["mobile_url"] or title_data["url"]
