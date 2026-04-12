@@ -70,9 +70,10 @@ def split_content_into_batches(
                 title_data_copy = title_data.copy()
                 title_data_copy["is_new"] = False
                 # 生成标题格式
-                # 飞书不支持 Markdown 链接，使用纯 URL 格式（标题 + 空格 + URL）
-                # 钉钉支持 Markdown 链接，使用 [标题](URL) 格式
-                use_plain_text = (format_type == "feishu")
+                # 飞书和钉钉都使用 Markdown 链接格式 [标题](URL)
+                # 飞书使用 post 消息类型（富文本），会渲染为可点击标题
+                # 钉钉使用 text 消息类型，会渲染为蓝色可点击文本
+                use_plain_text = False
                 formatted_title = format_title_for_platform(
                     format_type, title_data_copy, show_source=False, plain_text=use_plain_text
                 )
