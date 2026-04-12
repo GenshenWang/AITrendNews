@@ -51,7 +51,7 @@ def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
     将 Markdown 文本转换为飞书 post 消息格式
     
     支持：
-    - **粗体** → tag: text (保持 ** 符号，飞书会渲染)
+    - **粗体** → tag: text (使用 <strong> 标签)
     - [文本](URL) → tag: a, href: URL
     - 普通文本 → tag: text
     
@@ -61,6 +61,8 @@ def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
     Returns:
         飞书 post 消息的 content.post.zh_cn 格式
     """
+    import re
+    
     lines = markdown_text.split('\n')
     content = []
     
@@ -71,32 +73,41 @@ def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
         # 每行作为一个段落
         line_content = []
         
-        # 解析 Markdown 链接 [文本](URL)
-        import re
-        parts = re.split(r'(\[[^\]]+\]\([^)]+\))', line)
+        # 先处理粗体 **文本**，再处理链接 [文本](URL)
+        # 使用正则分割：粗体、链接、普通文本
+        parts = re.split(r'(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))', line)
         
         for part in parts:
             if not part:
                 continue
             
-            # 检查是否是链接格式
-            link_match = re.match(r'\[([^\]]+)\]\(([^)]+)\)', part)
-            if link_match:
-                # 是链接，添加为 <a> 标签
-                text = link_match.group(1)
-                url = link_match.group(2)
-                line_content.append({
-                    "tag": "a",
-                    "text": text,
-                    "href": url
-                })
-            else:
-                # 普通文本，添加为 <text> 标签
-                # 保留 ** 符号，飞书会渲染为粗体
+            # 检查是否是粗体格式
+            bold_match = re.match(r'\*\*(.+)\*\*', part)
+            if bold_match:
+                # 是粗体，添加为 <text> 标签，内容包含 HTML 粗体标签
+                bold_text = bold_match.group(1)
                 line_content.append({
                     "tag": "text",
-                    "text": part
+                    "text": f"<strong>{bold_text}</strong>"
                 })
+            else:
+                # 检查是否是链接格式
+                link_match = re.match(r'\[([^\]]+)\]\(([^)]+)\)', part)
+                if link_match:
+                    # 是链接，添加为 <a> 标签
+                    text = link_match.group(1)
+                    url = link_match.group(2)
+                    line_content.append({
+                        "tag": "a",
+                        "text": text,
+                        "href": url
+                    })
+                else:
+                    # 普通文本，添加为 <text> 标签
+                    line_content.append({
+                        "tag": "text",
+                        "text": part
+                    })
         
         if line_content:
             content.append(line_content)
