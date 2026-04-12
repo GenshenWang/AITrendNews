@@ -11,7 +11,7 @@ from trendradar.report.helpers import clean_title, html_escape, format_rank_disp
 
 
 def format_title_for_platform(
-    platform: str, title_data: Dict, show_source: bool = True, show_keyword: bool = False
+    platform: str, title_data: Dict, show_source: bool = True, show_keyword: bool = False, plain_text: bool = False
 ) -> str:
     """统一的标题格式化方法
 
@@ -45,7 +45,8 @@ def format_title_for_platform(
         格式化后的标题字符串
     """
     rank_display = format_rank_display(
-        title_data["ranks"], title_data["rank_threshold"], platform
+        title_data["ranks"], title_data["rank_threshold"], platform,
+        use_html=not (platform == "feishu" and not show_source and not show_keyword)
     )
 
     link_url = title_data["mobile_url"] or title_data["url"]
@@ -55,10 +56,18 @@ def format_title_for_platform(
     keyword = title_data.get("matched_keyword", "") if show_keyword else ""
 
     if platform == "feishu":
-        if link_url:
-            formatted_title = f"[{cleaned_title}]({link_url})"
+        # 纯文本模式：标题 + 空格 +URL
+        # Markdown 模式：[标题](URL) - 平台会渲染成蓝色可点击文本
+        if plain_text:
+            if link_url:
+                formatted_title = f"{cleaned_title} {link_url}"
+            else:
+                formatted_title = cleaned_title
         else:
-            formatted_title = cleaned_title
+            if link_url:
+                formatted_title = f"[{cleaned_title}]({link_url})"
+            else:
+                formatted_title = cleaned_title
 
         title_prefix = "🆕 " if title_data.get("is_new") else ""
 
@@ -67,22 +76,32 @@ def format_title_for_platform(
         elif show_keyword and keyword:
             result = f"<font color='blue'>[{keyword}]</font> {title_prefix}{formatted_title}"
         else:
+            # 不显示来源和关键词时，使用纯文本前缀（与钉钉一致）
             result = f"{title_prefix}{formatted_title}"
 
-        if rank_display:
-            result += f" {rank_display}"
-        if title_data["time_display"]:
-            result += f" <font color='grey'>- {title_data['time_display']}</font>"
-        if title_data["count"] > 1:
-            result += f" <font color='green'>({title_data['count']}次)</font>"
+        # 不显示来源时，也不显示排名、时间、次数（保持简洁）
+        # if rank_display:
+        #     result += f" {rank_display}"
+        # if title_data["time_display"]:
+        #     result += f" - {title_data['time_display']}"
+        # if title_data["count"] > 1:
+        #     result += f" ({title_data['count']}次)"
 
         return result
 
     elif platform == "dingtalk":
-        if link_url:
-            formatted_title = f"[{cleaned_title}]({link_url})"
+        # 纯文本模式：标题 + 空格 +URL
+        # Markdown 模式：[标题](URL) - 平台会渲染成蓝色可点击文本
+        if plain_text:
+            if link_url:
+                formatted_title = f"{cleaned_title} {link_url}"
+            else:
+                formatted_title = cleaned_title
         else:
-            formatted_title = cleaned_title
+            if link_url:
+                formatted_title = f"[{cleaned_title}]({link_url})"
+            else:
+                formatted_title = cleaned_title
 
         title_prefix = "🆕 " if title_data.get("is_new") else ""
 
@@ -93,12 +112,13 @@ def format_title_for_platform(
         else:
             result = f"{title_prefix}{formatted_title}"
 
-        if rank_display:
-            result += f" {rank_display}"
-        if title_data["time_display"]:
-            result += f" - {title_data['time_display']}"
-        if title_data["count"] > 1:
-            result += f" ({title_data['count']}次)"
+        # 不显示来源时，也不显示排名、时间、次数（保持简洁）
+        # if rank_display:
+        #     result += f" {rank_display}"
+        # if title_data["time_display"]:
+        #     result += f" - {title_data['time_display']}"
+        # if title_data["count"] > 1:
+        #     result += f" ({title_data['count']}次)"
 
         return result
 

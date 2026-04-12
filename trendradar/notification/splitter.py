@@ -3,13 +3,15 @@
 消息分批处理模块
 
 提供消息内容分批拆分功能，确保消息大小不超过各平台限制
-核心格式：加粗日期主标题 + 全局连续序号. 标题（链接）
+核心格式：加粗日期主标题 + 全局连续序号。标题（链接）
 """
 
 from datetime import datetime
 from typing import Dict, List, Optional, Callable
+import re
 
 from trendradar.report.formatter import format_title_for_platform
+from trendradar.report.helpers import clean_title
 
 # 默认批次大小配置（保留核心平台限制）
 DEFAULT_BATCH_SIZES = {
@@ -38,12 +40,12 @@ def split_content_into_batches(
     standalone_data: Optional[Dict] = None,
     rank_threshold: int = 10,
     ai_stats: Optional[Dict] = None,
-    report_type: str = "AI热门资讯",
+    report_type: str = "AI 热门资讯",
     show_new_section: bool = True,
 ) -> List[str]:
     """
     分批处理消息内容（仅保留新增新闻）
-    核心格式：**YYYY-MM-DD AI热门资讯** + 全局连续序号. 标题（链接）
+    核心格式：**YYYY-MM-DD AI 热门资讯** + 全局连续序号。标题（链接）
     """
     # 合并批次大小配置
     sizes = {**DEFAULT_BATCH_SIZES, **(batch_sizes or {})}
@@ -52,10 +54,10 @@ def split_content_into_batches(
 
     batches = []
     now = get_time_func() if get_time_func else datetime.now()
-    # 核心修改1：重构主标题（仅保留日期+AI热门资讯，加粗）
+    # 核心修改 1：重构主标题（仅保留日期+AI 热门资讯，加粗）
     main_title = f"**{now.strftime('%Y-%m-%d')} {report_type}**"
-    
-    # 核心修改2：扁平化提取所有新增新闻，生成全局序号列表
+
+    # 核心修改 2：扁平化提取所有新增新闻，生成全局序号列表
     all_new_titles = []
     seen_titles = set()  # 用于去重
     if show_new_section and report_data.get("new_titles", []):
@@ -67,16 +69,14 @@ def split_content_into_batches(
                     break
                 title_data_copy = title_data.copy()
                 title_data_copy["is_new"] = False
-                # 生成纯标题+链接，不显示来源
+                # 生成标题格式
+                # 钉钉和飞书都使用 Markdown 链接格式 [标题](URL)，平台会渲染成蓝色可点击文本
+                use_plain_text = False
                 formatted_title = format_title_for_platform(
-                    format_type, title_data_copy, show_source=False
+                    format_type, title_data_copy, show_source=False, plain_text=use_plain_text
                 )
-                # 移除标题后的[数字]后缀（如[19]）
-                formatted_title = formatted_title.rsplit("[", 1)[0].rstrip()
-                # 移除末尾的 **
-                formatted_title = formatted_title.rstrip("*").rstrip()
-                # 去重：使用纯标题文本（不含链接）作为去重键
-                title_text = formatted_title.split("(")[0].strip() if "(" in formatted_title else formatted_title
+                # 去重：使用原始标题文本（不含 URL）作为去重键
+                title_text = clean_title(title_data_copy["title"])
                 if title_text not in seen_titles:
                     seen_titles.add(title_text)
                     all_new_titles.append(f"{global_index}. {formatted_title}")
@@ -84,9 +84,9 @@ def split_content_into_batches(
             if global_index > max_titles:
                 break
 
-    # 核心修改3：分批处理（仅处理新增新闻，忽略所有其他区块）
+    # 核心修改 3：分批处理（仅处理新增新闻，忽略所有其他区块）
     if not all_new_titles:
-        # 无内容时返回主标题+提示
+        # 无内容时返回主标题 + 提示
         return [f"{main_title}\n\n📭 暂无本次新增热点新闻"]
 
     # 初始化当前批次
@@ -95,7 +95,7 @@ def split_content_into_batches(
 
     for line in all_new_titles:
         line_bytes = len(line.encode("utf-8")) + 1  # +1 是换行符
-        
+
         # 检查是否超出批次大小限制
         if current_batch_size + line_bytes > max_bytes:
             # 超出限制，完成当前批次
