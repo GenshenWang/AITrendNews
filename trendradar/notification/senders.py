@@ -15,6 +15,7 @@
 每个发送函数都支持分批发送，并通过参数化配置实现与 CONFIG 的解耦。
 """
 
+import re
 import smtplib
 import time
 import json
@@ -84,9 +85,11 @@ def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
     """
     将 Markdown 文本转换为飞书 post 消息格式
     
-    飞书 post 消息不支持 html tag，只支持：text, a, at, img, media, hashtag
-    粗体 **文本** 在 text tag 中保留，飞书部分版本会渲染
-    链接 [文本](URL) 转换为 a tag
+    飞书 post 消息支持：
+    - text: 普通文本
+    - a: 链接
+    
+    标题添加 emoji 突出显示（飞书不支持粗体）
     
     Args:
         markdown_text: Markdown 格式的文本
@@ -94,7 +97,13 @@ def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
     Returns:
         飞书 post 消息的 content.post.zh_cn 格式
     """
-    import re
+    # 匹配 **日期 + 标题** 格式，替换为 emoji + 文本
+    def replace_title(match):
+        title = match.group(1)
+        return f'📰 {title}'
+    
+    # 替换粗体标题
+    markdown_text = re.sub(r'\*\*(\d{4}-\d{2}-\d{2}.+?)\*\*', replace_title, markdown_text)
     
     lines = markdown_text.split('\n')
     content = []
@@ -103,7 +112,7 @@ def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
         if not line.strip():
             continue
         
-        # 解析每一行：链接用 a tag，其他用 text tag（保留 ** 符号）
+        # 解析每一行：链接用 a tag，其他用 text tag
         line_content = []
         parts = re.split(r'(\[[^\]]+\]\([^)]+\))', line)
         
@@ -123,7 +132,7 @@ def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
                     "href": url
                 })
             else:
-                # 普通文本（包含 ** 粗体标记），飞书可能渲染为粗体
+                # 普通文本
                 line_content.append({
                     "tag": "text",
                     "text": part
