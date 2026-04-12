@@ -50,10 +50,8 @@ def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
     """
     将 Markdown 文本转换为飞书 post 消息格式
     
-    支持：
-    - **粗体** → tag: text (使用 <strong> 标签)
-    - [文本](URL) → tag: a, href: URL
-    - 普通文本 → tag: text
+    飞书 post 消息支持 html tag，可以渲染 HTML 标签
+    将整行转换为 HTML 格式，支持 <strong> 和 <a> 标签
     
     Args:
         markdown_text: Markdown 格式的文本
@@ -70,47 +68,19 @@ def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
         if not line.strip():
             continue
         
-        # 每行作为一个段落
-        line_content = []
+        html_line = line
         
-        # 先处理粗体 **文本**，再处理链接 [文本](URL)
-        # 使用正则分割：粗体、链接、普通文本
-        parts = re.split(r'(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))', line)
+        # 1. 转换粗体 **文本** → <strong>文本</strong>
+        html_line = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', html_line)
         
-        for part in parts:
-            if not part:
-                continue
-            
-            # 检查是否是粗体格式
-            bold_match = re.match(r'\*\*(.+)\*\*', part)
-            if bold_match:
-                # 是粗体，添加为 <text> 标签，内容包含 HTML 粗体标签
-                bold_text = bold_match.group(1)
-                line_content.append({
-                    "tag": "text",
-                    "text": f"<strong>{bold_text}</strong>"
-                })
-            else:
-                # 检查是否是链接格式
-                link_match = re.match(r'\[([^\]]+)\]\(([^)]+)\)', part)
-                if link_match:
-                    # 是链接，添加为 <a> 标签
-                    text = link_match.group(1)
-                    url = link_match.group(2)
-                    line_content.append({
-                        "tag": "a",
-                        "text": text,
-                        "href": url
-                    })
-                else:
-                    # 普通文本，添加为 <text> 标签
-                    line_content.append({
-                        "tag": "text",
-                        "text": part
-                    })
+        # 2. 转换链接 [文本](URL) → <a href="URL">文本</a>
+        html_line = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2">\1</a>', html_line)
         
-        if line_content:
-            content.append(line_content)
+        # 使用 html tag 包裹整行 HTML
+        content.append([{
+            "tag": "html",
+            "text": html_line
+        }])
     
     return {
         "title": "",
