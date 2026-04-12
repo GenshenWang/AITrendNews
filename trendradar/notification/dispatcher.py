@@ -318,7 +318,7 @@ class NotificationDispatcher:
         """发送到飞书（多账号，支持热榜+RSS合并+AI分析+独立展示区）"""
         display_regions = display_regions or {}
         # 根据区域开关决定是否发送对应内容
-        if not display_regions.get("HOTLIST", True):
+        if not display_regions.get("hotlist", True):
             report_data = {"stats": [], "failed_ids": [], "new_titles": [], "id_to_name": {}}
 
         return self._send_to_multi_accounts(
@@ -341,7 +341,7 @@ class NotificationDispatcher:
                 ai_analysis=ai_analysis if display_regions.get("AI_ANALYSIS", True) else None,
                 display_regions=display_regions,
                 standalone_data=standalone_data if display_regions.get("STANDALONE", False) else None,
-                show_new_section=display_regions.get("HOTLIST", True),
+                show_new_section=display_regions.get("hotlist", True),
             ),
         )
 
@@ -360,7 +360,7 @@ class NotificationDispatcher:
     ) -> bool:
         """发送到钉钉（多账号，支持热榜+RSS合并+AI分析+独立展示区）"""
         display_regions = display_regions or {}
-        if not display_regions.get("HOTLIST", True):
+        if not display_regions.get("hotlist", True):
             report_data = {"stats": [], "failed_ids": [], "new_titles": [], "id_to_name": {}}
 
         return self._send_to_multi_accounts(
@@ -382,7 +382,7 @@ class NotificationDispatcher:
                 ai_analysis=ai_analysis if display_regions.get("AI_ANALYSIS", True) else None,
                 display_regions=display_regions,
                 standalone_data=standalone_data if display_regions.get("STANDALONE", False) else None,
-                show_new_section=display_regions.get("HOTLIST", True),
+                show_new_section=display_regions.get("hotlist", True),
             ),
         )
 
@@ -401,7 +401,7 @@ class NotificationDispatcher:
     ) -> bool:
         """发送到企业微信（多账号，支持热榜+RSS合并+AI分析+独立展示区）"""
         display_regions = display_regions or {}
-        if not display_regions.get("HOTLIST", True):
+        if not display_regions.get("hotlist", True):
             report_data = {"stats": [], "failed_ids": [], "new_titles": [], "id_to_name": {}}
 
         return self._send_to_multi_accounts(
@@ -442,7 +442,7 @@ class NotificationDispatcher:
     ) -> bool:
         """发送到 Telegram（多账号，需验证 token 和 chat_id 配对，支持热榜+RSS合并+AI分析+独立展示区）"""
         display_regions = display_regions or {}
-        if not display_regions.get("HOTLIST", True):
+        if not display_regions.get("hotlist", True):
             report_data = {"stats": [], "failed_ids": [], "new_titles": [], "id_to_name": {}}
 
         telegram_tokens = parse_multi_account_config(self.config["TELEGRAM_BOT_TOKEN"])
@@ -507,7 +507,7 @@ class NotificationDispatcher:
     ) -> bool:
         """发送到 ntfy（多账号，需验证 topic 和 token 配对，支持热榜+RSS合并+AI分析+独立展示区）"""
         display_regions = display_regions or {}
-        if not display_regions.get("HOTLIST", True):
+        if not display_regions.get("hotlist", True):
             report_data = {"stats": [], "failed_ids": [], "new_titles": [], "id_to_name": {}}
 
         ntfy_server_url = self.config["NTFY_SERVER_URL"]
@@ -571,7 +571,7 @@ class NotificationDispatcher:
     ) -> bool:
         """发送到 Bark（多账号，支持热榜+RSS合并+AI分析+独立展示区）"""
         display_regions = display_regions or {}
-        if not display_regions.get("HOTLIST", True):
+        if not display_regions.get("hotlist", True):
             report_data = {"stats": [], "failed_ids": [], "new_titles": [], "id_to_name": {}}
 
         return self._send_to_multi_accounts(
@@ -611,7 +611,7 @@ class NotificationDispatcher:
     ) -> bool:
         """发送到 Slack（多账号，支持热榜+RSS合并+AI分析+独立展示区）"""
         display_regions = display_regions or {}
-        if not display_regions.get("HOTLIST", True):
+        if not display_regions.get("hotlist", True):
             report_data = {"stats": [], "failed_ids": [], "new_titles": [], "id_to_name": {}}
 
         return self._send_to_multi_accounts(
@@ -651,7 +651,7 @@ class NotificationDispatcher:
     ) -> bool:
         """发送到通用 Webhook（多账号，支持热榜+RSS合并+AI分析+独立展示区）"""
         display_regions = display_regions or {}
-        if not display_regions.get("HOTLIST", True):
+        if not display_regions.get("hotlist", True):
             report_data = {"stats": [], "failed_ids": [], "new_titles": [], "id_to_name": {}}
 
         urls = parse_multi_account_config(self.config.get("GENERIC_WEBHOOK_URL", ""))
