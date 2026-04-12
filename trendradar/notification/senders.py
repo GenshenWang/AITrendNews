@@ -46,6 +46,40 @@ def _render_ai_analysis(ai_analysis: Any, channel: str) -> str:
         return ""
 
 
+def _convert_markdown_to_feishu_card(markdown_text: str) -> Dict:
+    """
+    将 Markdown 文本转换为飞书互动卡片格式
+    
+    飞书互动卡片支持 lark_md 格式，支持：
+    - **粗体**
+    - [文本](URL) 链接
+    - 换行、列表等
+    
+    Args:
+        markdown_text: Markdown 格式的文本
+    
+    Returns:
+        飞书互动卡片格式
+    """
+    # 飞书互动卡片格式
+    card = {
+        "config": {
+            "wide_screen_mode": True
+        },
+        "elements": [
+            {
+                "tag": "div",
+                "text": {
+                    "tag": "lark_md",
+                    "content": markdown_text
+                }
+            }
+        ]
+    }
+    
+    return card
+
+
 def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
     """
     将 Markdown 文本转换为飞书 post 消息格式
@@ -226,16 +260,12 @@ def send_to_feishu(
             f"发送{log_prefix}第 {i}/{len(batches)} 批次，大小：{content_size} 字节 [{report_type}]"
         )
 
-        # 飞书使用 post 消息类型（富文本），支持可点击链接
-        # 将 Markdown 格式转换为飞书富文本格式
-        feishu_post_content = _convert_markdown_to_feishu_post(batch_content)
+        # 飞书使用 interactive_card 消息类型（互动卡片），支持粗体和链接
+        # 将 Markdown 格式转换为飞书互动卡片格式
+        feishu_card_content = _convert_markdown_to_feishu_card(batch_content)
         payload = {
-            "msg_type": "post",
-            "content": {
-                "post": {
-                    "zh_cn": feishu_post_content
-                }
-            },
+            "msg_type": "interactive",
+            "card": feishu_card_content,
         }
 
         try:
