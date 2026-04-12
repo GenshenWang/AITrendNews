@@ -46,6 +46,67 @@ def _render_ai_analysis(ai_analysis: Any, channel: str) -> str:
         return ""
 
 
+def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
+    """
+    将 Markdown 文本转换为飞书 post 消息格式
+    
+    支持：
+    - **粗体** → tag: text (保持 ** 符号，飞书会渲染)
+    - [文本](URL) → tag: a, href: URL
+    - 普通文本 → tag: text
+    
+    Args:
+        markdown_text: Markdown 格式的文本
+    
+    Returns:
+        飞书 post 消息的 content.post.zh_cn 格式
+    """
+    lines = markdown_text.split('\n')
+    content = []
+    
+    for line in lines:
+        if not line.strip():
+            continue
+        
+        # 每行作为一个段落
+        line_content = []
+        
+        # 解析 Markdown 链接 [文本](URL)
+        import re
+        parts = re.split(r'(\[[^\]]+\]\([^)]+\))', line)
+        
+        for part in parts:
+            if not part:
+                continue
+            
+            # 检查是否是链接格式
+            link_match = re.match(r'\[([^\]]+)\]\(([^)]+)\)', part)
+            if link_match:
+                # 是链接，添加为 <a> 标签
+                text = link_match.group(1)
+                url = link_match.group(2)
+                line_content.append({
+                    "tag": "a",
+                    "text": text,
+                    "href": url
+                })
+            else:
+                # 普通文本，添加为 <text> 标签
+                # 保留 ** 符号，飞书会渲染为粗体
+                line_content.append({
+                    "tag": "text",
+                    "text": part
+                })
+        
+        if line_content:
+            content.append(line_content)
+    
+    return {
+        "title": "",
+        "content": content
+    }
+
+
 # === SMTP 邮件配置 ===
 SMTP_CONFIGS = {
     # Gmail（使用 STARTTLS）
@@ -168,11 +229,15 @@ def send_to_feishu(
             f"发送{log_prefix}第 {i}/{len(batches)} 批次，大小：{content_size} 字节 [{report_type}]"
         )
 
-        # 飞书 webhook 只显示 content.text，所有信息都整合到 text 中
+        # 飞书使用 post 消息类型（富文本），支持可点击链接
+        # 将 Markdown 格式转换为飞书富文本格式
+        feishu_post_content = _convert_markdown_to_feishu_post(batch_content)
         payload = {
-            "msg_type": "text",
+            "msg_type": "post",
             "content": {
-                "text": batch_content,
+                "post": {
+                    "zh_cn": feishu_post_content
+                }
             },
         }
 
