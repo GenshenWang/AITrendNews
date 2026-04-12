@@ -50,8 +50,9 @@ def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
     """
     将 Markdown 文本转换为飞书 post 消息格式
     
-    飞书 post 消息支持 html tag，可以渲染 HTML 标签
-    将整行转换为 HTML 格式，支持 <strong> 和 <a> 标签
+    飞书 post 消息的 html tag 支持 HTML 标签
+    只对包含 ** 的行使用 html tag（标题加粗）
+    其他行使用普通 text tag + a tag
     
     Args:
         markdown_text: Markdown 格式的文本
@@ -68,19 +69,43 @@ def _convert_markdown_to_feishu_post(markdown_text: str) -> Dict:
         if not line.strip():
             continue
         
-        html_line = line
-        
-        # 1. 转换粗体 **文本** → <strong>文本</strong>
-        html_line = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', html_line)
-        
-        # 2. 转换链接 [文本](URL) → <a href="URL">文本</a>
-        html_line = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2">\1</a>', html_line)
-        
-        # 使用 html tag 包裹整行 HTML
-        content.append([{
-            "tag": "html",
-            "text": html_line
-        }])
+        # 检查是否包含粗体标记 **
+        if '**' in line:
+            # 标题行，使用 html tag 支持粗体
+            html_line = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', line)
+            content.append([{
+                "tag": "html",
+                "text": html_line
+            }])
+        else:
+            # 普通行，解析链接
+            line_content = []
+            parts = re.split(r'(\[[^\]]+\]\([^)]+\))', line)
+            
+            for part in parts:
+                if not part:
+                    continue
+                
+                # 检查是否是链接格式
+                link_match = re.match(r'\[([^\]]+)\]\(([^)]+)\)', part)
+                if link_match:
+                    # 是链接，添加为 <a> 标签
+                    text = link_match.group(1)
+                    url = link_match.group(2)
+                    line_content.append({
+                        "tag": "a",
+                        "text": text,
+                        "href": url
+                    })
+                else:
+                    # 普通文本
+                    line_content.append({
+                        "tag": "text",
+                        "text": part
+                    })
+            
+            if line_content:
+                content.append(line_content)
     
     return {
         "title": "",
