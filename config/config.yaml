@@ -55,30 +55,90 @@ schedule:
 platforms:
   enabled: true                         # 是否启用热榜平台抓取
   sources:
-    - id: "36kr-quick"
-      name: "36氪 快讯"
-    - id: "36kr-renqi"
-      name: "36氪 人气榜"
-    - id: "wallstreetcn-hot"
-      name: "华尔街见闻"
+
+    # ── 综合新闻 ──────────────────────────────
+    - id: "toutiao"
+      name: "今日头条"
+    - id: "baidu"
+      name: "百度热搜"
     - id: "thepaper"
       name: "澎湃新闻"
-    - id: "bilibili-hot-search"
-      name: "bilibili 热搜"
-    - id: "cls-hot"
-      name: "财联社热门"
     - id: "ifeng"
       name: "凤凰网"
-    - id: "weibo"
-      name: "微博"
-    - id: "zhihu"
-      name: "知乎"
+    - id: "cankaoxiaoxi"
+      name: "参考消息"
+    - id: "zaobao"
+      name: "联合早报"
+    - id: "tencent-hot"
+      name: "腾讯新闻 综合早报"
+
+    # ── 科技 / 开发者 ──────────────────────────
+    - id: "ithome"
+      name: "IT之家"
+    - id: "sspai"
+      name: "少数派"
+    - id: "juejin"
+      name: "掘金"
+    - id: "github"
+      name: "GitHub 趋势"
+    - id: "hackernews"
+      name: "Hacker News"
+    - id: "solidot"
+      name: "Solidot"
+    - id: "producthunt"
+      name: "ProductHunt"
+    - id: "v2ex"
+      name: "V2EX"
+
+    # ── 财经 / 投资 ────────────────────────────
     - id: "wallstreetcn-hot"
       name: "华尔街见闻 最热"
     - id: "wallstreetcn-quick"
       name: "华尔街见闻 快讯"
-    - id: "wallstreetcn-news"
-      name: "华尔街见闻 最新"
+    - id: "cls-hot"
+      name: "财联社热门"
+    - id: "jin10"
+      name: "金十数据"
+    - id: "xueqiu"
+      name: "雪球"
+    - id: "gelonghui"
+      name: "格隆汇"
+
+    # ── 社交 / 社区 ────────────────────────────
+    - id: "weibo"
+      name: "微博"
+    - id: "zhihu"
+      name: "知乎"
+    - id: "douyin"
+      name: "抖音"
+    - id: "bilibili-hot-search"
+      name: "bilibili 热搜"
+    - id: "tieba"
+      name: "百度贴吧"
+    - id: "hupu"
+      name: "虎扑"
+
+    # ── 已禁用（按需开启） ─────────────────────
+    # - id: "36kr-quick"
+    #   name: "36氪 快讯"
+    # - id: "36kr-renqi"
+    #   name: "36氪 人气榜"
+    # - id: "wallstreetcn-news"
+    #   name: "华尔街见闻 最新"
+    # - id: "sputniknewscn"
+    #   name: "卫星通讯社"
+    # - id: "fastbull"
+    #   name: "快讯通"
+    # - id: "nowcoder"
+    #   name: "牛客网"
+    # - id: "pcbeta"
+    #   name: "远景论坛"
+    # - id: "chongbuluo"
+    #   name: "虫部落"
+    # - id: "mktnews"
+    #   name: "MKT新闻"
+    # - id: "kaopu"
+    #   name: "靠谱新闻"
 
 
 
@@ -115,14 +175,66 @@ rss:
   # - 正整数：覆盖全局设置，只推送此天数内的文章
   # - 0：禁用此频道的新鲜度过滤，推送所有文章
   feeds:
+
+    # ── 英文科技 / AI ──────────────────────────
     - id: "hacker-news"
       name: "Hacker News"
       url: "https://hnrss.org/frontpage"
 
+    - id: "techcrunch-ai"
+      name: "TechCrunch AI"
+      url: "https://techcrunch.com/category/artificial-intelligence/feed/"
+
+    - id: "theverge-ai"
+      name: "The Verge AI"
+      url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
+
+    - id: "wired-ai"
+      name: "Wired AI"
+      url: "https://www.wired.com/feed/tag/ai/latest/rss"
+
+    - id: "arxiv-ai"
+      name: "arXiv AI"
+      url: "http://export.arxiv.org/rss/cs.AI"
+
+    - id: "openai-blog"
+      name: "OpenAI Blog"
+      url: "https://openai.com/blog/rss.xml"
+
+    - id: "anthropic-blog"
+      name: "Anthropic Blog"
+      url: "https://www.anthropic.com/news/feed.xml"
+
+    - id: "google-ai-blog"
+      name: "Google AI Blog"
+      url: "https://blog.google/technology/ai/rss/"
+
+    - id: "venturebeat-ai"
+      name: "VentureBeat AI"
+      url: "https://venturebeat.com/category/ai/feed/"
+
+    # ── 中文科技 / AI ──────────────────────────
+    - id: "36kr-ai"
+      name: "36氪 AI"
+      url: "https://36kr.com/feed"
+
+    - id: "jiqizhixin"
+      name: "机器之心"
+      url: "https://www.jiqizhixin.com/rss"
+
+    - id: "qbitai"
+      name: "量子位"
+      url: "https://www.qbitai.com/feed"
+
+    # ── 综合 / 其他 ─────────────────────────────
     - id: "yahoo-finance"
       name: "雅虎财经"
       url: "https://finance.yahoo.com/news/rssindex"
       enabled: false
+
+    - id: "producthunt"
+      name: "Product Hunt"
+      url: "https://www.producthunt.com/feed"
 
 
     # 自定义源示例

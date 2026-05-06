@@ -182,10 +182,14 @@ DeepSeek
 OpenClaw
 ChatGPT
 GPT-4
+GPT-5
 Sora
+Sora2
 Claude
 Claude Code
+Claude 4
 Gemini
+Gemini 2.5
 文心一言
 通义千问
 豆包
@@ -220,6 +224,134 @@ AI教育
 大模型部署
 模型即服务
 推理优化
+
+# AI Agent / 智能体（2025-2026 最大热点）
+AI Agent
+智能体
+Agentic AI
+Agentic Coding
+多智能体
+Multi-Agent
+AI智能体
+Browser Agent
+Coding Agent
+Agent框架
+LangGraph
+AutoGen
+CrewAI
+AI工作流
+智能体编排
+
+# 具身智能 / 物理AI（2026 大爆发）
+具身智能
+物理AI
+Embodied AI
+Physical AI
+VLA模型
+世界模型
+空间智能
+机器人学习
+具身大模型
+
+# 人形机器人（CES 2026 热点）
+人形机器人
+Humanoid Robot
+仿生机器人
+机器人具身
+松延动力
+维他动力
+Figure AI
+Tesla Bot
+Optimus
+
+# 端侧AI / 边缘AI
+端侧AI
+边缘AI
+Edge AI
+On-device AI
+端侧大模型
+本地部署AI
+AI手机
+AI PC
+AI穿戴设备
+AI眼镜
+
+# 自动驾驶 / 无人驾驶
+自动驾驶
+无人驾驶
+Autonomous Driving
+Robotaxi
+无人配送
+无人飞行
+eVTOL
+低空经济
+
+# AI视频生成 / 图像生成
+文生视频
+图生视频
+视频生成模型
+Runway
+Pika
+Midjourney
+Stable Diffusion
+AI生图
+AI生成视频
+
+# AI语音 / AI音乐
+AI语音
+语音克隆
+语音合成
+AI音乐
+Suno
+Udio
+11Labs
+AI配音
+
+# AI搜索 / AI助手
+AI搜索
+AI助手
+AI浏览器
+Perplexity
+AI浏览器插件
+
+# 模型架构 / 技术热点
+MoE
+混合专家模型
+思维链
+Chain of Thought
+CoT
+模型蒸馏
+模型压缩
+端云协同
+开源模型
+闭源模型
+模型对齐
+AI安全
+AI治理
+AI监管
+数据飞轮
+AI芯片
+GPU
+推理芯片
+Groq
+
+# 新锐AI公司/项目
+Manus
+Midjourney
+Runway
+Llama
+Scale AI
+HuggingFace
+11Labs
+Suno
+Anthropic
+xAI
+Mistral
+MiniMax
+月之暗面
+阶跃星辰
+百川智能
+零一万物
 
 
 
